@@ -154,7 +154,7 @@ export default class RecipeView extends React.Component {
 
                 return(
                   <li key={category.id}>
-                    <a href = {"/categories/"+category.id} className="tag">
+                    <a href = {"/category/"+category.id} className="tag">
                       { category.name }
                     </a>
                   </li>
