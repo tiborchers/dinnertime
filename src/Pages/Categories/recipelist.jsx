@@ -16,6 +16,7 @@ export default class CategoryRecipeList extends React.Component {
     suggestions:[],
     value:'',
     empty: false,
+    loading: true,
   }
 
   componentDidMount() {
@@ -26,7 +27,7 @@ export default class CategoryRecipeList extends React.Component {
         if(recipes.length === 0){
           this.setState({ empty: true });
         }
-        this.setState({ recipes: recipes, recipesAll:recipes });
+        this.setState({ recipes: recipes, recipesAll:recipes, loading: false });
       });
   }
 
@@ -93,6 +94,17 @@ onSuggestionsFetchRequested = ({ value }) => {
     }
   }
 
+  loading(){
+    if(this.state.loading){
+      return(
+        <div class="spinner">
+  <div class="double-bounce1"></div>
+  <div class="double-bounce2"></div>
+</div>
+      );
+    }
+  }
+
   render() {
 
     const recipes = this.state.recipes;
@@ -117,6 +129,8 @@ onSuggestionsFetchRequested = ({ value }) => {
         renderSuggestion={this.renderSuggestion}
         inputProps={inputProps}
       />
+    <br />
+    {this.loading()}
           <div className = "center" >
 
           <CardDeck>

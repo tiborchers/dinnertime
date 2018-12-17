@@ -15,13 +15,14 @@ export default class IngredientList extends React.Component {
     ingredientsAll:[],
     suggestions:[],
     value:'',
+    loading: true,
   }
 
   componentDidMount() {
     axios.get(`https://dinnertime-back.herokuapp.com/api/ingredients/`)
       .then(res => {
         const ingredients = res.data;
-        this.setState({ ingredients: ingredients, ingredientsAll:ingredients });
+        this.setState({ ingredients: ingredients, ingredientsAll:ingredients, loading: false });
       });
   }
 
@@ -77,6 +78,20 @@ onSuggestionsFetchRequested = ({ value }) => {
     });
   };
 
+  loading(){
+    if(this.state.loading){
+      return(
+        <div class="spinner">
+  <div class="double-bounce1"></div>
+  <div class="double-bounce2"></div>
+</div>
+
+
+      );
+
+    }
+  }
+
   render() {
 
     const ingredients = this.state.ingredients;
@@ -106,6 +121,7 @@ onSuggestionsFetchRequested = ({ value }) => {
         <Button type="button" variant="dark" onClick={() => this.props.history.push('/ingredient/new')} className="small" block> Crear Nuevo Ingrediente</Button>
       </div>
       <br />
+      {this.loading()}
     <div className = "ing-center" >
 
           <CardDeck>

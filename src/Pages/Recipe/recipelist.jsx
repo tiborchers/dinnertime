@@ -16,13 +16,14 @@ export default class RecipeList extends React.Component {
     recipesAll:[],
     suggestions:[],
     value:'',
+    loading: true,
   }
 
   componentDidMount() {
     axios.get(`https://dinnertime-back.herokuapp.com/api/recipes`)
       .then(res => {
         const recipes = res.data;
-        this.setState({ recipes: recipes, recipesAll:recipes });
+        this.setState({ recipes: recipes, recipesAll:recipes, loading:false });
       });
   }
 
@@ -78,6 +79,17 @@ onSuggestionsFetchRequested = ({ value }) => {
     });
   };
 
+  loading(){
+    if(this.state.loading){
+      return(
+        <div class="spinner">
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
+      </div>
+      );
+    }
+  }
+
   render() {
 
     const recipes = this.state.recipes;
@@ -102,9 +114,11 @@ onSuggestionsFetchRequested = ({ value }) => {
         renderSuggestion={this.renderSuggestion}
         inputProps={inputProps}
       />
+    <br/>
     <div className='newButton'>
       <Button type="button" variant="dark" onClick={() => this.props.history.push('/recipe/new')} className="small" block> Crear Nueva Receta</Button>
     </div>
+    {this.loading()}
           <div className = "center" >
 
           <CardDeck>

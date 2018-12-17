@@ -604,6 +604,15 @@ export default class RecipeForm extends React.Component {
     let recipe = this.cleanForSumbit(this.state.recipe);
     axios.post(`https://dinnertime-back.herokuapp.com/api/recipes/`,recipe)
       .then(res => {
+        this.setState(prevState => (
+          {
+            recipe: {
+              ...prevState.recipe,
+              done: true,
+            }
+          }
+        )
+      );
         this.props.history.push('/recipe/'+res.data.id)
       })
       .catch(error => {
@@ -631,6 +640,15 @@ export default class RecipeForm extends React.Component {
     const { id } = this.props.match.params;
     axios.put(`https://dinnertime-back.herokuapp.com/api/recipes/${ id }/`, recipe)
       .then(res => {
+        this.setState(prevState => (
+          {
+            recipe: {
+              ...prevState.recipe,
+              done: true,
+            }
+          }
+        )
+      );
         return(
           this.props.history.push('/recipe/'+res.data.id)
         )
@@ -640,6 +658,18 @@ export default class RecipeForm extends React.Component {
 });
 
   }
+
+  loading(){
+    if(this.state.done){
+      return(
+        <div class="spinner">
+  <div class="double-bounce1"></div>
+  <div class="double-bounce2"></div>
+</div>
+      );
+    }
+  }
+
 
   render() {
     return (
@@ -756,6 +786,9 @@ export default class RecipeForm extends React.Component {
         </div>
         <div>
           {this.showCreateOrEdit()}
+        </div>
+        <div>
+          {this.loading()}
         </div>
       </div>
     )

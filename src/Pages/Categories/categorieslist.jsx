@@ -15,13 +15,14 @@ export default class CategoriesList extends React.Component {
     categoriesAll:[],
     suggestions:[],
     value:'',
+    loading:true,
   }
 
   componentDidMount() {
     axios.get(`https://dinnertime-back.herokuapp.com/api/categories/`)
       .then(res => {
         const categories = res.data;
-        this.setState({ categories: categories, categoriesAll:categories });
+        this.setState({ categories: categories, categoriesAll:categories, loading: false });
       });
   }
 
@@ -77,6 +78,17 @@ onSuggestionsFetchRequested = ({ value }) => {
     });
   };
 
+  loading(){
+    if(this.state.loading){
+      return(
+        <div class="spinner">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
+        </div>
+      );
+    }
+  }
+
   render() {
 
     const categories = this.state.categories;
@@ -102,10 +114,12 @@ onSuggestionsFetchRequested = ({ value }) => {
         inputProps={inputProps}
       />
       <br />
+
       <div className='newButton'>
         <Button type="button" variant="dark" onClick={() => this.props.history.push('/category/new')} className="small" block> Crear Nueva Categoria</Button>
       </div>
       <br />
+      {this.loading()}
           <div className = "center" >
 
           <CardDeck>
