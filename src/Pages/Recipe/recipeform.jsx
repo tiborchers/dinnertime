@@ -22,6 +22,9 @@ export default class RecipeForm extends React.Component {
     new: true,
     done: false,
     show: false,
+    valid: false,
+    nameValid: false,
+    authorValid: false,
     categories: [],
     authors:[{label: 'Borcho',
       value:{
@@ -561,7 +564,6 @@ export default class RecipeForm extends React.Component {
   cleanForSumbit(){
 
     let recipes = this.state.recipe;
-      console.log(recipes);
     let newCategories = recipes.category.map((category) => {return category.value.id});
     let newIngredients = recipes.ingredients.map((ingredient) => {
       let newAlternatives = ingredient.alternatives.map((alternative) => {
@@ -573,7 +575,6 @@ export default class RecipeForm extends React.Component {
     recipes.category = newCategories;
     recipes.author = this.state.recipe.author.value.id;
     recipes.ingredients = newIngredients;
-    console.log(newIngredients);
     return recipes;
 
   }
@@ -592,7 +593,6 @@ export default class RecipeForm extends React.Component {
     });
 
     newRecipe.ingredients = newIngredients;
-    console.log(newRecipe);
 
     return newRecipe;
 
@@ -606,10 +606,7 @@ export default class RecipeForm extends React.Component {
       .then(res => {
         this.setState(prevState => (
           {
-            recipe: {
-              ...prevState.recipe,
-              done: true,
-            }
+            done: true,
           }
         )
       );
@@ -617,6 +614,7 @@ export default class RecipeForm extends React.Component {
       })
       .catch(error => {
     console.log(error)
+    console.log(this.state.recipe);
 });
 
   }
