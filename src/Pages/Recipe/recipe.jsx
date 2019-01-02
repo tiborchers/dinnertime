@@ -4,7 +4,8 @@ import axios from 'axios';
 import './recipe.css'
 import Button from 'react-bootstrap/lib/Button'
 
-
+const APILink = 'https://dinnertime-back.herokuapp.com/api/'
+/* const APILink = 'http://127.0.0.1:8000/api/' */
 
 export default class RecipeView extends React.Component {
   state = {
@@ -22,7 +23,7 @@ export default class RecipeView extends React.Component {
   componentDidMount() {
     const { id } = this.props.match.params;
     if (id){
-    axios.get(`https://dinnertime-back.herokuapp.com/api/recipes/${ id }/`)
+    axios.get(`${APILink}recipes/${ id }/`)
       .then(res => {
         const recipe = res.data;
         this.setState({ recipe });

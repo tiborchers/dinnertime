@@ -1,10 +1,10 @@
 import React from 'react';
 import axios from 'axios';
-import Select from 'react-select';
 import { Button, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-
+const APILink = 'https://dinnertime-back.herokuapp.com/api/'
+/* const APILink = 'http://127.0.0.1:8000/api/' */
 
 
 export default class CategoryForm extends React.Component {
@@ -21,7 +21,7 @@ export default class CategoryForm extends React.Component {
   componentDidMount() {
     const { id } = this.props.match.params;
     if (id){
-    axios.get(`https://dinnertime-back.herokuapp.com/api/categories/${ id }`)
+    axios.get(`${APILink}categories/${ id }`)
       .then(res => {
         let category = res.data;
 
@@ -64,7 +64,7 @@ export default class CategoryForm extends React.Component {
   onSubmit=() => {
 
     let category = this.state.category;
-    axios.post(`https://dinnertime-back.herokuapp.com/api/categories/`,category)
+    axios.post(`${APILink}categories/`,category)
       .then(res => {
         console.log(res.data);
         this.props.history.push('/category/'+res.data.id)
@@ -77,7 +77,7 @@ export default class CategoryForm extends React.Component {
 
   onDelete=() => {
     const { id } = this.props.match.params;
-    axios.delete(`https://dinnertime-back.herokuapp.com/api/categories/${ id }`)
+    axios.delete(`${APILink}categories/${ id }`)
       .then(res => {
         return(
           this.props.history.push('/category')
@@ -92,7 +92,7 @@ export default class CategoryForm extends React.Component {
   onEdit=() => {
     let category = this.state.category;
     const { id } = this.props.match.params;
-    axios.put(`https://dinnertime-back.herokuapp.com/api/categories/${ id }/`, category)
+    axios.put(`${APILink}categories/${ id }/`, category)
       .then(res => {
         return(
           this.props.history.push('/category/'+res.data.id)

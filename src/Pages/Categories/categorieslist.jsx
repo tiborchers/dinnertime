@@ -7,7 +7,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Autosuggest from 'react-autosuggest';
 import Button from 'react-bootstrap/lib/Button'
 
-
+const APILink = 'https://dinnertime-back.herokuapp.com/api/'
+/* const APILink = 'http://127.0.0.1:8000/api/' */
 
 export default class CategoriesList extends React.Component {
   state = {
@@ -19,7 +20,7 @@ export default class CategoriesList extends React.Component {
   }
 
   componentDidMount() {
-    axios.get(`https://dinnertime-back.herokuapp.com/api/categories/`)
+    axios.get(`${APILink}categories/`)
       .then(res => {
         const categories = res.data;
         this.setState({ categories: categories, categoriesAll:categories, loading: false });

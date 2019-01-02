@@ -5,8 +5,9 @@ import Card from 'react-bootstrap/lib/Card'
 import CardDeck from 'react-bootstrap/lib/CardDeck'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Autosuggest from 'react-autosuggest';
-import Button from 'react-bootstrap/lib/Button'
 
+const APILink = 'https://dinnertime-back.herokuapp.com/api/'
+/* const APILink = 'http://127.0.0.1:8000/api/' */
 
 
 export default class IngredientRecipeList extends React.Component {
@@ -21,7 +22,7 @@ export default class IngredientRecipeList extends React.Component {
 
   componentDidMount() {
     const { id } = this.props.match.params;
-    axios.get(`https://dinnertime-back.herokuapp.com/api/ingredients/${id}/recipes/`)
+    axios.get(`${APILink}${id}/recipes/`)
       .then(res => {
         const recipes = res.data;
         if(recipes.length === 0){

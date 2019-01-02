@@ -4,8 +4,8 @@ import Select from 'react-select';
 import { Button, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-
-
+const APILink = 'https://dinnertime-back.herokuapp.com/api/'
+/* const APILink = 'http://127.0.0.1:8000/api/' */
 
 export default class IngredientForm extends React.Component {
   state = {
@@ -22,7 +22,7 @@ export default class IngredientForm extends React.Component {
   componentDidMount() {
     const { id } = this.props.match.params;
     if (id){
-    axios.get(`https://dinnertime-back.herokuapp.com/api/ingredients/${ id }`)
+    axios.get(`${APILink}ingredients/${ id }`)
       .then(res => {
 
         let ingredient = this.cleanForEdit(res.data);
@@ -30,7 +30,7 @@ export default class IngredientForm extends React.Component {
         this.setState({ 'ingredient': ingredient, 'new':false });
       });
     }
-    axios.get(`https://dinnertime-back.herokuapp.com/api/ingredients/`)
+    axios.get(`${APILink}ingredients/`)
         .then(res => {
           const ingredients = res.data;
           this.setState({ 'ingredients': ingredients,});
@@ -72,7 +72,7 @@ export default class IngredientForm extends React.Component {
     let ingredient = this.state.ingredient;
     ingredient = this.cleanForSumbit(ingredient);
     console.log(ingredient);
-    axios.post(`https://dinnertime-back.herokuapp.com/api/ingredients/`,ingredient)
+    axios.post(`${APILink}ingredients/`,ingredient)
       .then(res => {
         this.props.history.push('/ingredient/'+res.data.id)
       })
@@ -84,7 +84,7 @@ export default class IngredientForm extends React.Component {
 
   onDelete=() => {
     const { id } = this.props.match.params;
-    axios.delete(`https://dinnertime-back.herokuapp.com/api/ingredients/${ id }`)
+    axios.delete(`${APILink}ingredients/${ id }`)
       .then(res => {
         return(
           this.props.history.push('/ingredient')
@@ -100,7 +100,7 @@ export default class IngredientForm extends React.Component {
     let ingredient = this.state.ingredient;
     ingredient = this.cleanForSumbit(ingredient);
     const { id } = this.props.match.params;
-    axios.put(`https://dinnertime-back.herokuapp.com/api/ingredients/${ id }/`, ingredient)
+    axios.put(`${APILink}ingredients/${ id }/`, ingredient)
       .then(res => {
         return(
           this.props.history.push('/ingredient/'+res.data.id)

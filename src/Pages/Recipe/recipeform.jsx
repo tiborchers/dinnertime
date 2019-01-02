@@ -2,9 +2,12 @@ import React from 'react';
 import axios from 'axios';
 import Select from 'react-select';
 import { Button, Form } from 'react-bootstrap';
+import {DebounceInput} from 'react-debounce-input';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
+const APILink = 'https://dinnertime-back.herokuapp.com/api/' 
+/*const APILink = 'http://127.0.0.1:8000/api/'*/
 
 
 export default class RecipeForm extends React.Component {
@@ -13,7 +16,7 @@ export default class RecipeForm extends React.Component {
       id:0,
       name: '',
       category:[],
-      steps:[{text:'',photo:'', optional: false,order:1}],
+      steps:[],
       photo:'',
       video_url:'',
       ingredients:[{ingredient:{id:0, name:''},id:0, quantity: 0, measure:'',customMeasure: '',alternatives: []}],
@@ -60,7 +63,7 @@ export default class RecipeForm extends React.Component {
   componentDidMount() {
     const { id } = this.props.match.params;
     if (id){
-    axios.get(`https://dinnertime-back.herokuapp.com/api/recipes/${ id }`)
+    axios.get(`${APILink}recipes/${ id }`)
       .then(res => {
         let recipe = res.data;
         recipe = this.cleanForEdit(recipe);
@@ -69,17 +72,22 @@ export default class RecipeForm extends React.Component {
       });
 
     }
-    axios.get(`https://dinnertime-back.herokuapp.com/api/categories/`)
+    else {
+      this.handleAddStep();
+    }
+    axios.get(`${APILink}categories/`)
       .then(res => {
         const categories = res.data;
         this.setState({ 'categories': categories,});
       });
-    axios.get(`https://dinnertime-back.herokuapp.com/api/ingredients/`)
+    axios.get(`${APILink}ingredients/`)
         .then(res => {
           const ingredients = res.data;
           this.setState({ 'ingredients': ingredients,});
         });
   }
+
+
 
   handleIngredientQuantityChange = (idx) => (evt) => {
     const newIngredients = this.state.recipe.ingredients.map((ingredient, sidx) => {
@@ -137,7 +145,7 @@ export default class RecipeForm extends React.Component {
     this.setState(prevState => ({
       recipe: {
         ...prevState.recipe,
-        ingredients: this.state.recipe.ingredients.concat([{ingredient:{id:0, name:''}, quantity: 0, measure:'',customMeasure: null,alternatives: []}]),
+        ingredients: this.state.recipe.ingredients.concat([{id:0,ingredient:{id:0, name:''}, quantity: 0, measure:'',customMeasure: null,alternatives: []}]),
       }
     }));
 
@@ -394,12 +402,14 @@ export default class RecipeForm extends React.Component {
     )
   }
 
-  handleStepTextChange = (idx) =>  (evt) => {
+  handleStepTextChange = (idx) => (evt) => {
+    const value = evt.target.value;
     const newSteps = this.state.recipe.steps.map((step, sidx) => {
       if (idx !== sidx) return step;
-      return { ...step, text: evt.target.value };
+      return { ...step, text: value };
     });
-    this.setState(prevState => ({
+
+  this.setState(prevState => ({
       recipe: {
         ...prevState.recipe,
         steps: newSteps,
@@ -450,16 +460,33 @@ export default class RecipeForm extends React.Component {
     this.setState(prevState => ({
       recipe: {
         ...prevState.recipe,
-        steps: this.state.recipe.steps.concat([{text:'',photo:'', optional: false,order:this.state.recipe.steps.length + 1}]),
+        steps: this.state.recipe.steps.concat([{id: 0, text:'',photo:'', optional: false,order:this.state.recipe.steps.length + 1}]),
       }
     }));
 
   }
 
-  handleRemoveStep = (idx) => () => {
+/*  handleRemoveStep = (idx) => () => {
     this.setState(prevState => ({
       recipe: { ...prevState.recipe,
         steps: this.state.recipe.steps.filter((s, sidx) => idx !== sidx)
+      }
+    }));
+  } */
+
+  handleRemoveStep = (idx) => () => {
+    let reduce = 0;
+    let newSteps = this.state.recipe.steps.map((step, sidx) => {
+      if (idx !== sidx) return { ...step, order: sidx + 1 + reduce };
+      else{
+        reduce = reduce - 1;
+      }
+    });
+    newSteps = newSteps.filter((s, sidx) => idx !== sidx);
+    this.setState(prevState => ({
+      recipe: {
+        ...prevState.recipe,
+        steps: newSteps,
       }
     }));
   }
@@ -469,14 +496,15 @@ export default class RecipeForm extends React.Component {
   stepRow(step, i){
     return(
       <li key={step.order}>
-
         <div>
           <Form.Group>
           <Form.Label htmlFor='text'> Instrucción:  </Form.Label>
-          <Form.Control as="textarea" rows="5"
-            defaultValue={step.text}
+          <DebounceInput element={Form.Control}
+            as="textarea"
+            rows="5"
+            value={step.text}
             placeholder='Ingrese Texto'
-            onBlur={this.handleStepTextChange(i)}
+            onChange={this.handleStepTextChange(i)}
             />
         </Form.Group>
         </div>
@@ -485,9 +513,9 @@ export default class RecipeForm extends React.Component {
           <Form.Label htmlFor='photo'> Foto:  </Form.Label>
           <Form.Control
             type='text'
-            defaultValue={step.photo}
+            value={step.photo}
             placeholder='solo una urls por ahora jeje'
-            onBlur={this.handleStepPhotoChange(i)}
+            onChange={this.handleStepPhotoChange(i)}
             />
         </Form.Group>
         </div>
@@ -594,6 +622,7 @@ export default class RecipeForm extends React.Component {
 
     newRecipe.ingredients = newIngredients;
 
+
     return newRecipe;
 
 
@@ -602,26 +631,30 @@ export default class RecipeForm extends React.Component {
   onSubmit=() => {
 
     let recipe = this.cleanForSumbit(this.state.recipe);
-    axios.post(`https://dinnertime-back.herokuapp.com/api/recipes/`,recipe)
+    axios.post(`${APILink}recipes/`,recipe)
       .then(res => {
-        this.setState(prevState => (
+        this.setState(
           {
             done: true,
           }
-        )
-      );
-        this.props.history.push('/recipe/'+res.data.id)
+        );
+
+        this.props.history.push('/recipe/'+res.data.id);
       })
       .catch(error => {
     console.log(error)
-    console.log(this.state.recipe);
+    this.setState(
+      {
+          recipe: this.cleanForEdit(this.state.recipe)
+      }
+    );
 });
 
   }
 
   onDelete=() => {
     const { id } = this.props.match.params;
-    axios.delete(`https://dinnertime-back.herokuapp.com/api/recipes/${ id }`)
+    axios.delete(`${APILink}recipes/${ id }`)
       .then(res => {
         return(
           this.props.history.push('/recipe')
@@ -636,15 +669,13 @@ export default class RecipeForm extends React.Component {
   onEdit=() => {
     let recipe = this.cleanForSumbit(this.state.recipe);
     const { id } = this.props.match.params;
-    axios.put(`https://dinnertime-back.herokuapp.com/api/recipes/${ id }/`, recipe)
+    recipe.id = id;
+    axios.put(`${APILink}recipes/${ id }/`, recipe)
       .then(res => {
         this.setState(prevState => (
           {
-            recipe: {
-              ...prevState.recipe,
               done: true,
             }
-          }
         )
       );
         return(
@@ -653,11 +684,17 @@ export default class RecipeForm extends React.Component {
       })
       .catch(error => {
     console.log(error)
+    this.setState(
+      {
+          recipe: this.cleanForEdit(this.state.recipe)
+      }
+    );
 });
 
   }
 
   loading(){
+
     if(this.state.done){
       return(
         <div class="spinner">

@@ -8,7 +8,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Autosuggest from 'react-autosuggest';
 
 
-
+const APILink = 'https://dinnertime-back.herokuapp.com/api/' 
+ /* const APILink = 'http://127.0.0.1:8000/api/' */
 
 export default class RecipeList extends React.Component {
   state = {
@@ -20,7 +21,7 @@ export default class RecipeList extends React.Component {
   }
 
   componentDidMount() {
-    axios.get(`https://dinnertime-back.herokuapp.com/api/recipes`)
+    axios.get(`${APILink}recipes`)
       .then(res => {
         const recipes = res.data;
         this.setState({ recipes: recipes, recipesAll:recipes, loading:false });
